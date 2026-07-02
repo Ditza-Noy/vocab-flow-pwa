@@ -60,34 +60,23 @@
   }
 
   /* ---------------- Bootstrapping ---------------- */
-  const DEFAULT_WORDS = [
-    ["hello", "שלום"],
-    ["thank you", "תודה"],
-    ["please", "בבקשה"],
-    ["water", "מים"],
-    ["food", "אוכל"],
-    ["house", "בית"],
-    ["friend", "חבר"],
-    ["book", "ספר"],
-    ["day", "יום"],
-    ["night", "לילה"],
-    ["love", "אהבה"],
-    ["work", "עבודה"],
-    ["time", "זמן"],
-    ["happy", "שמח"],
-    ["big", "גדול"],
-  ];
-
-  function bootstrap() {
+function bootstrap() {
     const tracks = getTracks();
     if (tracks.length === 0) {
-      const seed = window.DEFAULT_TRACK;
-      const name = seed && seed.name ? seed.name : "General Conversation";
-      const pairs = seed && Array.isArray(seed.words) && seed.words.length ? seed.words : DEFAULT_WORDS;
+      // Set the default name to Band 1
+      const name = "Band 1 Words";
       const id = "track_" + uuid().replace(/-/g, "").slice(0, 12);
-      const words = pairs.map(([en, he]) => makeWord(en, he));
+      
+      // Load the Band 1 words from the global window object (loaded via words-band1.js)
+      // Fallback to empty array if the file didn't load properly
+      const sourceWords = window.band1Words || [];
+      
+      // Map the object structure { english, hebrew } into your app's word objects
+      const words = sourceWords.map(item => makeWord(item.english, item.hebrew));
+      
       // First batch active so the app is usable immediately.
       words.slice(0, ADD_BATCH).forEach((w) => (w.status = STATUS_ACTIVE));
+      
       setWords(id, words);
       setTracks([{ id: id, name: name }]);
       writeJSON(SELECTED_TRACK_KEY, id);
