@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>English Vocabulary Trainer</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css?v=2" />
+</head>
+<body>
+  <div id="app">
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="view-dashboard" class="view active">
+      <header class="app-header">
+        <h1>Vocabulary Trainer</h1>
+      </header>
+
+      <div class="card">
+        <label class="field-label" for="track-select">Track</label>
+        <div class="row">
+          <select id="track-select" class="select"></select>
+        </div>
+      </div>
+
+      <div class="card stats-card">
+        <div class="stat">
+          <span class="stat-num" id="stat-active">0</span>
+          <span class="stat-label">Active</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="stat-pending">0</span>
+          <span class="stat-label">Pending</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Total</span>
+        </div>
+      </div>
+
+      <button id="btn-add-words" class="btn btn-primary btn-block">＋ Add 4 new words to cycle</button>
+
+      <div class="section-title">Learn</div>
+      <div class="grid-2">
+        <button class="btn btn-mode" data-nav="flashcards">🃏<span>Flashcards</span></button>
+        <button class="btn btn-mode" data-nav="mcq">🔢<span>Multiple Choice</span></button>
+        <button class="btn btn-mode" data-nav="typing">⌨️<span>Typing</span></button>
+        <button class="btn btn-mode btn-test" data-nav="test-setup">🏆<span>Test</span></button>
+      </div>
+
+      <div class="section-title">Manage</div>
+      <button class="btn btn-block" data-nav="import">📥 Import words</button>
+
+      <div class="section-title">Danger Zone</div>
+      <div class="card">
+        <button id="btn-reset" class="btn btn-danger btn-block">Reset all data</button>
+      </div>
+    </section>
+
+    <!-- ===================== IMPORT ===================== -->
+    <section id="view-import" class="view">
+      <header class="app-header sub">
+        <button class="btn-back" data-nav="dashboard">‹ Back</button>
+        <h2>Import Words</h2>
+      </header>
+      <div class="card">
+        <p class="hint">Paste tab-separated rows (English &lt;TAB&gt; Hebrew), one per line — Excel copy/paste works. Or upload a CSV.</p>
+        <textarea id="import-text" class="textarea" rows="5" placeholder="hello&#9;שלום&#10;thank you&#9;תודה"></textarea>
+        <div class="row">
+          <input type="file" id="import-file" accept=".csv,text/csv,text/plain" class="file-input" />
+        </div>
+        <label class="field-label" for="import-target">Add to</label>
+        <select id="import-target" class="select"></select>
+        <div id="import-newname-wrap" class="hidden">
+          <label class="field-label" for="import-newname">New track name</label>
+          <input type="text" id="import-newname" class="input" placeholder="e.g. Business English" />
+        </div>
+        <button id="btn-import" class="btn btn-primary btn-block">Import words</button>
+        <p id="import-msg" class="msg"></p>
+      </div>
+    </section>
+
+    <!-- ===================== FLASHCARDS ===================== -->
+    <section id="view-flashcards" class="view">
+      <header class="app-header sub">
+        <button class="btn-back" data-nav="dashboard">‹ Back</button>
+        <h2>Flashcards</h2>
+      </header>
+      <div id="flashcards-body" class="practice-body"></div>
+    </section>
+
+    <!-- ===================== MULTIPLE CHOICE ===================== -->
+    <section id="view-mcq" class="view">
+      <header class="app-header sub">
+        <button class="btn-back" data-nav="dashboard">‹ Back</button>
+        <h2>Multiple Choice</h2>
+      </header>
+      <div id="mcq-body" class="practice-body"></div>
+    </section>
+
+    <!-- ===================== TYPING ===================== -->
+    <section id="view-typing" class="view">
+      <header class="app-header sub">
+        <button class="btn-back" data-nav="dashboard">‹ Back</button>
+        <h2>Typing</h2>
+      </header>
+      <div id="typing-body" class="practice-body"></div>
+    </section>
+
+    <!-- ===================== TEST SETUP ===================== -->
+    <section id="view-test-setup" class="view">
+      <header class="app-header sub">
+        <button class="btn-back" data-nav="dashboard">‹ Back</button>
+        <h2>Test</h2>
+      </header>
+      <div class="card">
+        <label class="field-label">Format</label>
+        <div class="seg" id="test-format">
+          <button class="seg-btn active" data-format="mcq">Multiple Choice</button>
+          <button class="seg-btn" data-format="typing">Typing</button>
+        </div>
+
+        <label class="field-label">Number of words</label>
+        <div class="seg" id="test-count">
+          <button class="seg-btn" data-count="5">5</button>
+          <button class="seg-btn active" data-count="10">10</button>
+          <button class="seg-btn" data-count="20">20</button>
+          <button class="seg-btn" data-count="all">All</button>
+        </div>
+
+        <p id="test-setup-info" class="hint"></p>
+        <button id="btn-start-test" class="btn btn-primary btn-block">Start Test</button>
+      </div>
+    </section>
+
+    <!-- ===================== TEST RUN ===================== -->
+    <section id="view-test-run" class="view">
+      <header class="app-header sub">
+        <button class="btn-back" data-nav="dashboard">‹ Quit</button>
+        <h2 id="test-progress">Question</h2>
+      </header>
+      <div id="test-run-body" class="practice-body"></div>
+    </section>
+
+    <!-- ===================== TEST RESULTS ===================== -->
+    <section id="view-test-results" class="view">
+      <header class="app-header sub">
+        <button class="btn-back" data-nav="dashboard">‹ Back</button>
+        <h2>Results</h2>
+      </header>
+      <div id="test-results-body" class="practice-body"></div>
+    </section>
+  </div>
+
+  <script src="words-band1.js?v=2"></script>
+  <script src="app.js?v=2"></script>
+</body>
+</html>
