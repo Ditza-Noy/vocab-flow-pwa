@@ -154,6 +154,18 @@ function bootstrap() {
     return a;
   }
 
+  function speakText(text, lang) {
+    if (!text) return;
+    if (!("speechSynthesis" in window)) return;
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const utterance = new SpeechSynthesisUtterance(String(text).trim());
+    utterance.lang = lang || "en-US";
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+    synth.speak(utterance);
+  }
+
   /* ---------------- View routing ---------------- */
   function show(viewId) {
     document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
@@ -335,6 +347,7 @@ function bootstrap() {
     body.innerHTML = `
       <div class="flashcard" id="fc-card">
         <div class="fc-main">${esc(word.english)}</div>
+        <button class="speaker-btn" id="fc-speak" type="button" aria-label="Hear word">🔊</button>
         <div class="fc-hint">Tap to reveal</div>
       </div>
       <div class="grid-2 hidden" id="fc-buttons">
@@ -345,14 +358,24 @@ function bootstrap() {
 
     const card = document.getElementById("fc-card");
     const buttons = document.getElementById("fc-buttons");
+    const speakBtn = document.getElementById("fc-speak");
+    speakBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      speakText(word.english, "en-US");
+    });
     card.addEventListener("click", () => {
       if (flashState.flipped) return;
       flashState.flipped = true;
       card.classList.add("flipped", "rtl");
       card.innerHTML = `
         <div class="fc-main">${esc(word.hebrew)}</div>
+        <button class="speaker-btn" id="fc-speak" type="button" aria-label="Hear word">🔊</button>
         <div class="fc-hint">${esc(word.english)}</div>`;
       buttons.classList.remove("hidden");
+      document.getElementById("fc-speak").addEventListener("click", (e) => {
+        e.stopPropagation();
+        speakText(word.hebrew, "he-IL");
+      });
     });
     document.getElementById("fc-knew").addEventListener("click", () => {
       recordResult(state.selectedTrackId, word.id, true);
@@ -386,10 +409,14 @@ function bootstrap() {
     const options = buildOptions(pool, word);
 
     body.innerHTML = `
-      <div class="prompt-word">${esc(word.english)}</div>
+      <div class="prompt-row">
+        <div class="prompt-word">${esc(word.english)}</div>
+        <button class="speaker-btn" id="mcq-speak" type="button" aria-label="Hear word">🔊</button>
+      </div>
       <div class="prompt-sub">Choose the Hebrew translation</div>
       <div class="mcq-grid" id="mcq-grid"></div>
     `;
+    document.getElementById("mcq-speak").addEventListener("click", () => speakText(word.english, "en-US"));
     const grid = document.getElementById("mcq-grid");
     options.forEach((opt) => {
       const b = document.createElement("button");
@@ -425,7 +452,10 @@ function bootstrap() {
     typingState.lastId = word.id;
 
     body.innerHTML = `
-      <div class="prompt-word rtl">${esc(word.hebrew)}</div>
+      <div class="prompt-row">
+        <div class="prompt-word rtl">${esc(word.hebrew)}</div>
+        <button class="speaker-btn" id="ty-speak" type="button" aria-label="Hear word">🔊</button>
+      </div>
       <div class="prompt-sub">Type the English translation</div>
       <input type="text" id="ty-input" class="input" autocomplete="off"
         autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="english…" />
@@ -436,6 +466,7 @@ function bootstrap() {
 
     const input = document.getElementById("ty-input");
     const checkBtn = document.getElementById("ty-check");
+    document.getElementById("ty-speak").addEventListener("click", () => speakText(word.hebrew, "he-IL"));
     input.focus();
 
     function check() {
@@ -528,9 +559,13 @@ function bootstrap() {
       const options = buildOptions(pool, word);
       body.innerHTML = `
         ${bar}
-        <div class="prompt-word">${esc(word.english)}</div>
+        <div class="prompt-row">
+          <div class="prompt-word">${esc(word.english)}</div>
+          <button class="speaker-btn" id="test-mcq-speak" type="button" aria-label="Hear word">🔊</button>
+        </div>
         <div class="prompt-sub">Choose the Hebrew translation</div>
         <div class="mcq-grid" id="test-grid"></div>`;
+      document.getElementById("test-mcq-speak").addEventListener("click", () => speakText(word.english, "en-US"));
       const grid = document.getElementById("test-grid");
       options.forEach((opt) => {
         const b = document.createElement("button");
@@ -554,7 +589,10 @@ function bootstrap() {
       // typing
       body.innerHTML = `
         ${bar}
-        <div class="prompt-word rtl">${esc(word.hebrew)}</div>
+        <div class="prompt-row">
+          <div class="prompt-word rtl">${esc(word.hebrew)}</div>
+          <button class="speaker-btn" id="test-ty-speak" type="button" aria-label="Hear word">🔊</button>
+        </div>
         <div class="prompt-sub">Type the English translation</div>
         <input type="text" id="test-input" class="input" autocomplete="off"
           autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="english…" />
@@ -563,6 +601,7 @@ function bootstrap() {
         <div id="test-feedback"></div>`;
       const input = document.getElementById("test-input");
       const checkBtn = document.getElementById("test-check");
+      document.getElementById("test-ty-speak").addEventListener("click", () => speakText(word.hebrew, "he-IL"));
       input.focus();
       function check() {
         const val = input.value;

@@ -164,6 +164,29 @@ body {
 .prompt-sub { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 18px; }
 
 /* Flashcard */
+.prompt-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.speaker-btn {
+  border: none;
+  border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.speaker-btn:active { transform: scale(0.96); }
+
 .flashcard {
   background: var(--card);
   border-radius: 20px;
